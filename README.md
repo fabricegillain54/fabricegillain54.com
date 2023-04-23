@@ -16,34 +16,8 @@ Amendment Record :
 # - lynxpo : trust des lynxpo des PO & trust de lynxpologin des MONO
 # - ansible : trust uniquement le compte "sysansible@PosteSAM"
 # MONO :
-# - lynx : trust des SRV vers les SRV + lynxpo sur lui meme (localhost)
-# - lynxweb : Pas de trust a l install & pas de clef
-# - lynxpo : trust de lynxpologin sur lui meme & trust de lynxpo des PO
-# - lynxpologin : Pas de trust
-# NONE :
-# - lynxpo : pas de trust
-# - lynx : trust des SRV vers les PO
-# - ansible : trust uniquement le compte "sysansible@PosteSAM"
-#
-# Generation des clefs SSH pour une plateforme
-
-UserList="lynx lynxpo lynxpologin ansible sysansible"
-# ajout pour distribuer les cles ssh des lynxpologin MONO en post traitement
-MonoList=" "
-
-##########
-# Suppression du domain name a la fin d'un hostname.
-# $1 Hostname
-# $2 Domain name
-StripDomainFromHostname_ ()
-{
-Host=$1
-Domain=$2
-if [ "x$Domain" != "x" ]; then
-        echo "${Host/%.$Domain/}"
-else
-        echo "$Host"
-fi
+# - 
+# - lynxpo : trust de lynxpologin sur lui meme & trust de lynxpo des POfi
 }
 
 ##########
@@ -656,15 +630,7 @@ GenPlatform ()
         # Generation du fichier nftables.conf
         for uplt in $(echo ${GPLT} | sed 's/|/ /g'); do
                 mkdir -p "${PosO}/${uplt}"
-                NFTABLESCONF="${PosO}/${uplt}/nftables.conf"
-                cp -Lp ${Dir_rac}/conf/nftables.conf "$NFTABLESCONF"
-                echo "$(date '+%d-%m-%Y %H:%M:%S')-${appli}- Generation du fichier nftables.conf pour la plate-forme $uplt"
-                val=${UPLT_SRV_IPADDRS["$uplt"]}
-                if [ "x$val" != "x" ]; then
-                        sed -i -e "s/SRVIPADDRLIST/${val}/g" "$NFTABLESCONF"
-                else
-                        echo "Impossible de trouver des adresses IP pour les serveurs de la plate-forme $uplt !"
-                        sed -i -e 's/define SRV/#define SRV/g' "$NFTABLESCONF"
+                NFTABLESCONF="${PosO}/${uplt}/'s/define SRV/#define SRV/g' "$NFTABLESCONF"
                         sed -i -e 's/tcp dport 11130 ip saddr $SRV /tcp dport 11130 /g' "$NFTABLESCONF"
                 fi
                 val=${UPLT_PO_IPADDRS["$uplt"]}
@@ -677,9 +643,5 @@ GenPlatform ()
                 val=${UPLT_MONO_IPADDRS["$uplt"]}
                 if [ "x$val" != "x" ]; then
                         sed -i -e "s/MONOIPADDRLIST/${val}/g" "$NFTABLESCONF"
-                else
-                        echo "Impossible de trouver des adresses IP pour les MONOs de la plate-forme $uplt !"
-                        sed -i -e 's/define MONO/#define MONO/g' "$NFTABLESCONF"
-                fi
-        done
+             
 }
